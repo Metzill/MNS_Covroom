@@ -2,15 +2,13 @@
 
 namespace App\Entity;
 
-use App\Repository\TravelPreferenceRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
+use App\Repository\RateRepository;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * @ORM\Entity(repositoryClass=TravelPreferenceRepository::class)
+ * @ORM\Entity(repositoryClass=RateRepository::class)
  */
-class TravelPreference
+class Rate
 {
     /**
      * @ORM\Id
@@ -20,19 +18,26 @@ class TravelPreference
     private $id;
 
     /**
-     * @ORM\Column(type="string", length=255)
+     * @ORM\Column(type="integer")
      */
-    private $name;
+    private $Rate;
 
     /**
      * @ORM\Column(type="string", length=255)
      */
-    private $picture;
+    private $Comment;
 
     /**
-     * @ORM\ManyToMany(targetEntity=Travel::class, mappedBy="TravelPreferences")
+     * @ORM\ManyToOne(targetEntity=User::class, inversedBy="RatingWritten")
+     * @ORM\JoinColumn(nullable=false)
      */
-    private $travel;
+    private $IdUserRating;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=User::class, inversedBy="RatingReceived")
+     * @ORM\JoinColumn(nullable=false)
+     */
+    private $IdUserRated;
 
     /**
      * @ORM\Column(type="datetime")
@@ -49,63 +54,55 @@ class TravelPreference
      */
     private $deleted_at;
 
-    public function __construct()
-    {
-        $this->travel = new ArrayCollection();
-    }
-
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getName(): ?string
+    public function getRate(): ?int
     {
-        return $this->name;
+        return $this->Rate;
     }
 
-    public function setName(string $name): self
+    public function setRate(int $Rate): self
     {
-        $this->name = $name;
+        $this->Rate = $Rate;
 
         return $this;
     }
 
-    public function getPicture(): ?string
+    public function getComment(): ?string
     {
-        return $this->picture;
+        return $this->Comment;
     }
 
-    public function setPicture(string $picture): self
+    public function setComment(string $Comment): self
     {
-        $this->picture = $picture;
+        $this->Comment = $Comment;
 
         return $this;
     }
 
-    /**
-     * @return Collection<int, Travel>
-     */
-    public function getTravel(): Collection
+    public function getIdUserRating(): ?User
     {
-        return $this->travel;
+        return $this->IdUserRating;
     }
 
-    public function addTravel(Travel $travel): self
+    public function setIdUserRating(?User $IdUserRating): self
     {
-        if (!$this->travel->contains($travel)) {
-            $this->travel[] = $travel;
-            $travel->addTravelPreference($this);
-        }
+        $this->IdUserRating = $IdUserRating;
 
         return $this;
     }
 
-    public function removeTravel(Travel $travel): self
+    public function getIdUserRated(): ?User
     {
-        if ($this->travel->removeElement($travel)) {
-            $travel->removeTravelPreference($this);
-        }
+        return $this->IdUserRated;
+    }
+
+    public function setIdUserRated(?User $IdUserRated): self
+    {
+        $this->IdUserRated = $IdUserRated;
 
         return $this;
     }

@@ -2,13 +2,13 @@
 
 namespace App\Entity;
 
-use App\Repository\FavoriteRepository;
+use App\Repository\SeatRepository;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * @ORM\Entity(repositoryClass=FavoriteRepository::class)
+ * @ORM\Entity(repositoryClass=SeatRepository::class)
  */
-class Favorite
+class Seat
 {
     /**
      * @ORM\Id
@@ -18,20 +18,20 @@ class Favorite
     private $id;
 
     /**
-     * @ORM\Column(type="string", length=255)
+     * @ORM\Column(type="boolean")
      */
-    private $StartCity;
+    private $Status;
 
     /**
-     * @ORM\Column(type="string", length=255)
-     */
-    private $EndCity;
-
-    /**
-     * @ORM\ManyToOne(targetEntity=User::class, inversedBy="favorites")
+     * @ORM\ManyToOne(targetEntity=Travel::class, inversedBy="seats")
      * @ORM\JoinColumn(nullable=false)
      */
-    private $IdUser;
+    private $IdTravel;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=Booking::class, inversedBy="seats")
+     */
+    private $IdBooking;
 
     /**
      * @ORM\Column(type="datetime")
@@ -41,7 +41,7 @@ class Favorite
     /**
      * @ORM\Column(type="datetime", nullable=true)
      */
-    private $updated_at;
+    private $update_at;
 
     /**
      * @ORM\Column(type="datetime", nullable=true)
@@ -53,38 +53,38 @@ class Favorite
         return $this->id;
     }
 
-    public function getStartCity(): ?string
+    public function isStatus(): ?bool
     {
-        return $this->StartCity;
+        return $this->Status;
     }
 
-    public function setStartCity(string $StartCity): self
+    public function setStatus(bool $Status): self
     {
-        $this->StartCity = $StartCity;
+        $this->Status = $Status;
 
         return $this;
     }
 
-    public function getEndCity(): ?string
+    public function getIdTravel(): ?Travel
     {
-        return $this->EndCity;
+        return $this->IdTravel;
     }
 
-    public function setEndCity(string $EndCity): self
+    public function setIdTravel(?Travel $IdTravel): self
     {
-        $this->EndCity = $EndCity;
+        $this->IdTravel = $IdTravel;
 
         return $this;
     }
 
-    public function getIdUser(): ?User
+    public function getIdBooking(): ?Booking
     {
-        return $this->IdUser;
+        return $this->IdBooking;
     }
 
-    public function setIdUser(?User $IdUser): self
+    public function setIdBooking(?Booking $IdBooking): self
     {
-        $this->IdUser = $IdUser;
+        $this->IdBooking = $IdBooking;
 
         return $this;
     }
@@ -101,14 +101,14 @@ class Favorite
         return $this;
     }
 
-    public function getUpdatedAt(): ?\DateTimeInterface
+    public function getUpdateAt(): ?\DateTimeInterface
     {
-        return $this->updated_at;
+        return $this->update_at;
     }
 
-    public function setUpdatedAt(\DateTimeInterface $updated_at): self
+    public function setUpdateAt(\DateTimeInterface $update_at): self
     {
-        $this->updated_at = $updated_at;
+        $this->update_at = $update_at;
 
         return $this;
     }
@@ -118,7 +118,7 @@ class Favorite
         return $this->deleted_at;
     }
 
-    public function setDeletedAt(\DateTimeInterface $deleted_at): self
+    public function setDeletedAt(?\DateTimeInterface $deleted_at): self
     {
         $this->deleted_at = $deleted_at;
 

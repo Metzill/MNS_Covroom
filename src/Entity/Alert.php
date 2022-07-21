@@ -2,15 +2,13 @@
 
 namespace App\Entity;
 
-use App\Repository\TravelPreferenceRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
+use App\Repository\AlertRepository;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * @ORM\Entity(repositoryClass=TravelPreferenceRepository::class)
+ * @ORM\Entity(repositoryClass=AlertRepository::class)
  */
-class TravelPreference
+class Alert
 {
     /**
      * @ORM\Id
@@ -22,17 +20,29 @@ class TravelPreference
     /**
      * @ORM\Column(type="string", length=255)
      */
-    private $name;
+    private $Message;
 
     /**
      * @ORM\Column(type="string", length=255)
      */
-    private $picture;
+    private $Type;
 
     /**
-     * @ORM\ManyToMany(targetEntity=Travel::class, mappedBy="TravelPreferences")
+     * @ORM\Column(type="datetime")
      */
-    private $travel;
+    private $Read_at;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=User::class, inversedBy="alerts")
+     * @ORM\JoinColumn(nullable=false)
+     */
+    private $IdUser;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=Travel::class, inversedBy="alerts")
+     * @ORM\JoinColumn(nullable=false)
+     */
+    private $Travel;
 
     /**
      * @ORM\Column(type="datetime")
@@ -49,63 +59,67 @@ class TravelPreference
      */
     private $deleted_at;
 
-    public function __construct()
-    {
-        $this->travel = new ArrayCollection();
-    }
-
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getName(): ?string
+    public function getMessage(): ?string
     {
-        return $this->name;
+        return $this->Message;
     }
 
-    public function setName(string $name): self
+    public function setMessage(string $Message): self
     {
-        $this->name = $name;
+        $this->Message = $Message;
 
         return $this;
     }
 
-    public function getPicture(): ?string
+    public function getType(): ?string
     {
-        return $this->picture;
+        return $this->Type;
     }
 
-    public function setPicture(string $picture): self
+    public function setType(string $Type): self
     {
-        $this->picture = $picture;
+        $this->Type = $Type;
 
         return $this;
     }
 
-    /**
-     * @return Collection<int, Travel>
-     */
-    public function getTravel(): Collection
+    public function getReadAt(): ?\DateTimeInterface
     {
-        return $this->travel;
+        return $this->Read_at;
     }
 
-    public function addTravel(Travel $travel): self
+    public function setReadAt(\DateTimeInterface $Read_at): self
     {
-        if (!$this->travel->contains($travel)) {
-            $this->travel[] = $travel;
-            $travel->addTravelPreference($this);
-        }
+        $this->Read_at = $Read_at;
 
         return $this;
     }
 
-    public function removeTravel(Travel $travel): self
+    public function getIdUser(): ?User
     {
-        if ($this->travel->removeElement($travel)) {
-            $travel->removeTravelPreference($this);
-        }
+        return $this->IdUser;
+    }
+
+    public function setIdUser(?User $IdUser): self
+    {
+        $this->IdUser = $IdUser;
+
+        return $this;
+    }
+
+    public function getTravel(): ?Travel
+    {
+        return $this->Travel;
+    }
+
+    public function setTravel(?Travel $Travel): self
+    {
+        $this->Travel = $Travel;
 
         return $this;
     }

@@ -2,15 +2,13 @@
 
 namespace App\Entity;
 
-use App\Repository\TravelPreferenceRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
+use App\Repository\MessageRepository;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * @ORM\Entity(repositoryClass=TravelPreferenceRepository::class)
+ * @ORM\Entity(repositoryClass=MessageRepository::class)
  */
-class TravelPreference
+class Message
 {
     /**
      * @ORM\Id
@@ -22,17 +20,17 @@ class TravelPreference
     /**
      * @ORM\Column(type="string", length=255)
      */
-    private $name;
+    private $Text;
 
     /**
-     * @ORM\Column(type="string", length=255)
+     * @ORM\Column(type="datetime")
      */
-    private $picture;
+    private $Sent_at;
 
     /**
-     * @ORM\ManyToMany(targetEntity=Travel::class, mappedBy="TravelPreferences")
+     * @ORM\Column(type="datetime")
      */
-    private $travel;
+    private $Read_at;
 
     /**
      * @ORM\Column(type="datetime")
@@ -49,63 +47,55 @@ class TravelPreference
      */
     private $deleted_at;
 
-    public function __construct()
-    {
-        $this->travel = new ArrayCollection();
-    }
+    /**
+     * @ORM\ManyToOne(targetEntity=User::class, inversedBy="MessagesSent")
+     * @ORM\JoinColumn(nullable=false)
+     */
+    private $IdSender;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=User::class, inversedBy="MessagesReceived")
+     * @ORM\JoinColumn(nullable=false)
+     */
+    private $IdReceiver;
 
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getName(): ?string
+    public function getText(): ?string
     {
-        return $this->name;
+        return $this->Text;
     }
 
-    public function setName(string $name): self
+    public function setText(string $Text): self
     {
-        $this->name = $name;
+        $this->Text = $Text;
 
         return $this;
     }
 
-    public function getPicture(): ?string
+    public function getSentAt(): ?\DateTimeInterface
     {
-        return $this->picture;
+        return $this->Sent_at;
     }
 
-    public function setPicture(string $picture): self
+    public function setSentAt(\DateTimeInterface $Sent_at): self
     {
-        $this->picture = $picture;
+        $this->Sent_at = $Sent_at;
 
         return $this;
     }
 
-    /**
-     * @return Collection<int, Travel>
-     */
-    public function getTravel(): Collection
+    public function getReadAt(): ?\DateTimeInterface
     {
-        return $this->travel;
+        return $this->Read_at;
     }
 
-    public function addTravel(Travel $travel): self
+    public function setReadAt(\DateTimeInterface $Read_at): self
     {
-        if (!$this->travel->contains($travel)) {
-            $this->travel[] = $travel;
-            $travel->addTravelPreference($this);
-        }
-
-        return $this;
-    }
-
-    public function removeTravel(Travel $travel): self
-    {
-        if ($this->travel->removeElement($travel)) {
-            $travel->removeTravelPreference($this);
-        }
+        $this->Read_at = $Read_at;
 
         return $this;
     }
@@ -142,6 +132,30 @@ class TravelPreference
     public function setDeletedAt(\DateTimeInterface $deleted_at): self
     {
         $this->deleted_at = $deleted_at;
+
+        return $this;
+    }
+
+    public function getIdSender(): ?User
+    {
+        return $this->IdSender;
+    }
+
+    public function setIdSender(?User $IdSender): self
+    {
+        $this->IdSender = $IdSender;
+
+        return $this;
+    }
+
+    public function getIdReceiver(): ?User
+    {
+        return $this->IdReceiver;
+    }
+
+    public function setIdReceiver(?User $IdReceiver): self
+    {
+        $this->IdReceiver = $IdReceiver;
 
         return $this;
     }

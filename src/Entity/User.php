@@ -84,11 +84,62 @@ class User
      */
     private $favorites;
 
+    /**
+     * @ORM\OneToMany(targetEntity=Rate::class, mappedBy="IdUserRating", orphanRemoval=true)
+     */
+    private $RatingWritten;
+
+    /**
+     * @ORM\OneToMany(targetEntity=Rate::class, mappedBy="IdUserRated", orphanRemoval=true)
+     */
+    private $RatingReceived;
+
+    /**
+     * @ORM\Column(type="datetime")
+     */
+    private $created_at;
+
+    /**
+     * @ORM\Column(type="datetime", nullable=true)
+     */
+    private $updated_at;
+
+    /**
+     * @ORM\Column(type="datetime", nullable=true)
+     */
+    private $deleted_at;
+
+    /**
+     * @ORM\OneToMany(targetEntity=Message::class, mappedBy="IdSender", orphanRemoval=true)
+     */
+    private $MessagesSent;
+
+    /**
+     * @ORM\OneToMany(targetEntity=Message::class, mappedBy="IdReceiver", orphanRemoval=true)
+     */
+    private $MessagesReceived;
+
+    /**
+     * @ORM\OneToMany(targetEntity=Alert::class, mappedBy="IdUser", orphanRemoval=true)
+     */
+    private $alerts;
+
+    /**
+     * @ORM\OneToMany(targetEntity=Booking::class, mappedBy="IdUser", orphanRemoval=true)
+     */
+    private $bookings;
+
     public function __construct()
     {
         $this->cars = new ArrayCollection();
         $this->Travels = new ArrayCollection();
         $this->favorites = new ArrayCollection();
+        $this->RatingWritten = new ArrayCollection();
+        $this->RatingReceived = new ArrayCollection();
+        $this->MessagesSent = new ArrayCollection();
+        $this->MessagesReceived = new ArrayCollection();
+        $this->alerts = new ArrayCollection();
+        $this->bookings = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -300,6 +351,222 @@ class User
             // set the owning side to null (unless already changed)
             if ($favorite->getIdUser() === $this) {
                 $favorite->setIdUser(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Rate>
+     */
+    public function getRatingWritten(): Collection
+    {
+        return $this->RatingWritten;
+    }
+
+    public function addRatingWritten(Rate $ratingWritten): self
+    {
+        if (!$this->RatingWritten->contains($ratingWritten)) {
+            $this->RatingWritten[] = $ratingWritten;
+            $ratingWritten->setIdUserRating($this);
+        }
+
+        return $this;
+    }
+
+    public function removeRatingWritten(Rate $ratingWritten): self
+    {
+        if ($this->RatingWritten->removeElement($ratingWritten)) {
+            // set the owning side to null (unless already changed)
+            if ($ratingWritten->getIdUserRating() === $this) {
+                $ratingWritten->setIdUserRating(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Rate>
+     */
+    public function getRatingReceived(): Collection
+    {
+        return $this->RatingReceived;
+    }
+
+    public function addRatingReceived(Rate $ratingReceived): self
+    {
+        if (!$this->RatingReceived->contains($ratingReceived)) {
+            $this->RatingReceived[] = $ratingReceived;
+            $ratingReceived->setIdUserRated($this);
+        }
+
+        return $this;
+    }
+
+    public function removeRatingReceived(Rate $ratingReceived): self
+    {
+        if ($this->RatingReceived->removeElement($ratingReceived)) {
+            // set the owning side to null (unless already changed)
+            if ($ratingReceived->getIdUserRated() === $this) {
+                $ratingReceived->setIdUserRated(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function getCreatedAt(): ?\DateTimeInterface
+    {
+        return $this->created_at;
+    }
+
+    public function setCreatedAt(\DateTimeInterface $created_at): self
+    {
+        $this->created_at = $created_at;
+
+        return $this;
+    }
+
+    public function getUpdatedAt(): ?\DateTimeInterface
+    {
+        return $this->updated_at;
+    }
+
+    public function setUpdatedAt(\DateTimeInterface $updated_at): self
+    {
+        $this->updated_at = $updated_at;
+
+        return $this;
+    }
+
+    public function getDeletedAt(): ?\DateTimeInterface
+    {
+        return $this->deleted_at;
+    }
+
+    public function setDeletedAt(\DateTimeInterface $deleted_at): self
+    {
+        $this->deleted_at = $deleted_at;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Message>
+     */
+    public function getMessagesSent(): Collection
+    {
+        return $this->MessagesSent;
+    }
+
+    public function addMessagesSent(Message $messagesSent): self
+    {
+        if (!$this->MessagesSent->contains($messagesSent)) {
+            $this->MessagesSent[] = $messagesSent;
+            $messagesSent->setIdSender($this);
+        }
+
+        return $this;
+    }
+
+    public function removeMessagesSent(Message $messagesSent): self
+    {
+        if ($this->MessagesSent->removeElement($messagesSent)) {
+            // set the owning side to null (unless already changed)
+            if ($messagesSent->getIdSender() === $this) {
+                $messagesSent->setIdSender(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Message>
+     */
+    public function getMessagesReceived(): Collection
+    {
+        return $this->MessagesReceived;
+    }
+
+    public function addMessagesReceived(Message $messagesReceived): self
+    {
+        if (!$this->MessagesReceived->contains($messagesReceived)) {
+            $this->MessagesReceived[] = $messagesReceived;
+            $messagesReceived->setIdReceiver($this);
+        }
+
+        return $this;
+    }
+
+    public function removeMessagesReceived(Message $messagesReceived): self
+    {
+        if ($this->MessagesReceived->removeElement($messagesReceived)) {
+            // set the owning side to null (unless already changed)
+            if ($messagesReceived->getIdReceiver() === $this) {
+                $messagesReceived->setIdReceiver(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Alert>
+     */
+    public function getAlerts(): Collection
+    {
+        return $this->alerts;
+    }
+
+    public function addAlert(Alert $alert): self
+    {
+        if (!$this->alerts->contains($alert)) {
+            $this->alerts[] = $alert;
+            $alert->setIdUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeAlert(Alert $alert): self
+    {
+        if ($this->alerts->removeElement($alert)) {
+            // set the owning side to null (unless already changed)
+            if ($alert->getIdUser() === $this) {
+                $alert->setIdUser(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Booking>
+     */
+    public function getBookings(): Collection
+    {
+        return $this->bookings;
+    }
+
+    public function addBooking(Booking $booking): self
+    {
+        if (!$this->bookings->contains($booking)) {
+            $this->bookings[] = $booking;
+            $booking->setIdUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeBooking(Booking $booking): self
+    {
+        if ($this->bookings->removeElement($booking)) {
+            // set the owning side to null (unless already changed)
+            if ($booking->getIdUser() === $this) {
+                $booking->setIdUser(null);
             }
         }
 
