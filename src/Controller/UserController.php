@@ -34,10 +34,10 @@ class UserController extends AbstractController
             $created_at_dt->setTimezone(new DateTimeZone('Europe/Paris'));
 
             $updated_at_dt = $user->getUpdatedAt();
-            $updated_at_dt->setTimezone(new DateTimeZone('Europe/Paris'));
+            if($updated_at_dt != null) $updated_at_dt->setTimezone(new DateTimeZone('Europe/Paris'));
 
             $deleted_at_dt = $user->getDeletedAt();
-            $deleted_at_dt->setTimezone(new DateTimeZone('Europe/Paris'));
+            if($deleted_at_dt != null) $deleted_at_dt->setTimezone(new DateTimeZone('Europe/Paris'));
 
             $user_data[] = [
                 'id' => $user->getId(),
@@ -68,7 +68,7 @@ class UserController extends AbstractController
     /**
      * @Route("/new", name="new")
      */
-    public function createTravelPreference(ManagerRegistry $doctrine, Request $request): Response
+    public function createUser(ManagerRegistry $doctrine, Request $request): Response
     {
         $entityManager = $doctrine->getManager();
 
@@ -112,13 +112,13 @@ class UserController extends AbstractController
         ->getRepository(User::class)
         ->find($id);
 
-        $user->setEmail($PutJson['email']);
-        $user->setPassword($PutJson['password']); 
-        $user->setProfilePicture($PutJson['profilePicture']);
-        $user->setPhoneNumber($PutJson['phoneNumber']);
-        $user->setRole($PutJson['role']);
-        $user->setDescription($PutJson['description']);
-        $user->setMailConfirmation($PutJson['mailConfirm']);
+        if(array_key_exists('email',$PutJson)) $user->setEmail($PutJson['email']);
+        if(array_key_exists('password',$PutJson)) $user->setPassword($PutJson['password']); 
+        if(array_key_exists('profilePicture',$PutJson)) $user->setProfilePicture($PutJson['profilePicture']);
+        if(array_key_exists('phoneNumber',$PutJson)) $user->setPhoneNumber($PutJson['phoneNumber']);
+        if(array_key_exists('role',$PutJson)) $user->setRole($PutJson['role']);
+        if(array_key_exists('description',$PutJson)) $user->setDescription($PutJson['description']);
+        if(array_key_exists('mailConfirm',$PutJson)) $user->setMailConfirmation($PutJson['mailConfirm']);
         $user->setUpdatedAt($today);
 
         $entityManager->persist(($user));
