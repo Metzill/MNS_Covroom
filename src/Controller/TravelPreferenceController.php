@@ -6,29 +6,28 @@ use App\Entity\TravelPreference;
 use App\Repository\TravelPreferenceRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\Validator\Validator\ValidatorInterface;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\HttpFoundation\Request;
 
 /**
- * @Route("/api", name="api_")
+ * @Route("/travel_preference", name="travel_preference_")
  */
 class TravelPreferenceController extends AbstractController
 {
     /**
-     * @Route("/travel_preference", name="index_travel_preference")
+     * @Route("/", name="index")
      */
-    public function index(ManagerRegistry $doctrine, TravelPreferenceRepository $TravelPreferenceRepository): Response
+    public function index(ManagerRegistry $doctrine): Response
     {
-        $travel_preferences = $TravelPreferenceRepository->findAll();
+        $travel_preferences = $doctrine
+        ->getRepository(TravelPreference::class)
+        ->findAll();
 
         $travel_preference_data = [];
 
         foreach ($travel_preferences as $travel_preference) {
             $travel_preference_data[] = [
-                'id' => $travel_preference->getIdTravelPreference(),
+                'id' => $travel_preference->getId(),
                 'name' => $travel_preference->getName(),
                 'picture' => $travel_preference->getPicture(),
             ];
@@ -38,7 +37,7 @@ class TravelPreferenceController extends AbstractController
     }
     
     /**
-     * @Route("/travel_preference/create", name="new_travel_preference")
+     * @Route("/new", name="new")
      */
     public function createTravelPreference(ManagerRegistry $doctrine): Response
     {
@@ -52,6 +51,6 @@ class TravelPreferenceController extends AbstractController
 
         $entityManager->flush();
         
-        return new Response('Saved new travel_preference with id '.$travel_preference->getIdTravelPreference());
+        return new Response('Saved new travel_preference with id '.$travel_preference->getId());
     }
 }

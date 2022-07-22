@@ -129,6 +129,11 @@ class User
      */
     private $bookings;
 
+    /**
+     * @ORM\Column(type="string", length=255)
+     */
+    private $PhoneNumber;
+
     public function __construct()
     {
         $this->cars = new ArrayCollection();
@@ -569,6 +574,18 @@ class User
                 $booking->setIdUser(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getPhoneNumber(): ?string
+    {
+        return $this->PhoneNumber;
+    }
+
+    public function setPhoneNumber(string $PhoneNumber): self
+    {
+        $this->PhoneNumber = $PhoneNumber;
 
         return $this;
     }
