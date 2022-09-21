@@ -36,25 +36,27 @@ class TravelController extends AbstractController
     public function new(ManagerRegistry $doctrine, Request $request): Response
     {
         $entityManager = $doctrine->getManager();
+        $newPostJson = json_decode($request->getContent(), true);
 
         $today = new DateTime();
         $today->setTimezone(new DateTimeZone("UTC"));
 
         $travel = new Travel();
 
-        $car = $doctrine->getRepository(Car::class)->find($request->query->get('idCar'));
-        $user = $doctrine->getRepository(User::class)->find($request->query->get('idUser'));
+
+        $car = $doctrine->getRepository(Car::class)->find($newPostJson['idCar']);
+        $user = $doctrine->getRepository(User::class)->find($newPostJson['idUser']);
 
 
         $travel->setIdCar($car);
         $travel->setIdUser($user);
-        $travel->setSeatAtTheBegining($request->query->get('seatAtTheBegining'));
-        $travel->setStartLatitude($request->query->get('startLatitude'));
-        $travel->setStartLongitude($request->query->get('startLongitude'));
-        $travel->setEndLatitude($request->query->get('endLatitude'));
-        $travel->setEndLongitude($request->query->get('endLongitude'));
-        $travel->setStartCity($request->query->get('startCity'));
-        $travel->setEndCity($request->query->get('endCity'));
+        $travel->setSeatAtTheBegining($newPostJson['seatAtTheBegining']);
+        $travel->setStartLatitude($newPostJson['startLatitude']);
+        $travel->setStartLongitude($newPostJson['startLongitude']);
+        $travel->setEndLatitude($newPostJson['endLatitude']);
+        $travel->setEndLongitude($newPostJson['endLongitude']);
+        $travel->setStartCity($newPostJson['startCity']);
+        $travel->setEndCity($newPostJson['endCity']);
 //        temporaire
         $travel->setStartTime($today);
         $travel->setEndTime($today);
