@@ -2,8 +2,10 @@
 
 namespace App\Controller;
 
+use App\Entity\Travel;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
@@ -15,11 +17,12 @@ class TravelController extends AbstractController
     /**
      * @Route("/", name="index")
      */
-    public function index(): Response
+    public function index(ManagerRegistry $doctrine): Response
     {
-        return $this->json([
-            'message' => 'Welcome to your new controller!',
-            'path' => 'src/Controller/TravelController.php',
-        ]);
+        $travel = $doctrine
+            ->getRepository(Travel::class)
+            ->findAll();
+
+        return new JsonResponse($travel);
     }
 }
