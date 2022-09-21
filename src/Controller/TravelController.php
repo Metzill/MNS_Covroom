@@ -24,11 +24,27 @@ class TravelController extends AbstractController
      */
     public function index(ManagerRegistry $doctrine): Response
     {
-        $travel = $doctrine
+        $travels = $doctrine
             ->getRepository(Travel::class)
             ->findAll();
 
-        return new JsonResponse($travel);
+        $travel_data = [];
+
+
+        foreach ($travels as $travel) {
+            $driver = $doctrine->getRepository(User::class)->findBy(['id'=>$travel->getIdUser()->getId()]);
+            $travel_data[] = [
+                'id' => $travel->getId(),
+                'start_city' => $travel->getStartCity(),
+                'end_city' => $travel->getEndCity(),
+                'user' => ['name' =>$driver[0]->getName(),'firstname' => $driver[0]->getFirstName()],
+                'startAt' => $travel->getStartTime(),
+                'endAt' => $travel->getEndTime(),
+                'travelTime' => '1h30',
+            ];
+        }
+
+        return $this->json($travel_data);
     }
     /**
      * @Route("/new", name="new")
