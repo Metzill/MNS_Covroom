@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Car;
+use App\Entity\Seat;
 use App\Entity\Travel;
 use App\Entity\User;
 use DateTime;
@@ -83,6 +84,20 @@ class TravelController extends AbstractController
         $entityManager->persist(($travel));
 
         $entityManager->flush();
+
+        //créer les seats vide lié à ce trajet
+        $seatMax = $newPostJson['seatAtTheBegining'];
+
+        for ($i = 0; $i<$seatMax; $i++) {
+            $seat = new Seat ();
+            $seat->setStatus(0);
+            $seat->setCreatedAt($today);
+            $seat->setIdTravel($travel);
+
+            $entityManager->persist(($seat));
+
+            $entityManager->flush();
+        }
 
         return new Response('Saved new travel with id '.$travel->getId());
     }
