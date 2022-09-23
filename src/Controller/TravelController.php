@@ -84,6 +84,6 @@ class TravelController extends AbstractController
 
         $entityManager->flush();
 
-        return new Response('Saved new user with id '.$travel->getId());
+        return new Response('Saved new travel with id '.$travel->getId());
     }
 }
