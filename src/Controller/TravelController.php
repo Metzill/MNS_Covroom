@@ -47,6 +47,50 @@ class TravelController extends AbstractController
 
         return $this->json($travel_data);
     }
+
+    /**
+     * @Route("/retrieve/{id}", name="retrieve<")
+     */
+    public function retrieve(ManagerRegistry $doctrine, $id): Response
+    {
+        $travel = $doctrine
+            ->getRepository(Travel::class)
+            ->find($id);
+
+        $driver = $doctrine->getRepository(User::class)->findBy(['id'=>$travel->getIdUser()->getId()]);
+
+        $seats = $doctrine->getRepository(Seat::class)->findBy(['IdTravel'=>$travel->getId()]);
+
+        $car = $doctrine->getRepository(Car::class)->findBy(['id'=>$travel->getIdCar()->getId()]);
+
+        $available =0;
+        foreach ($seats as $seat) {
+            if (!$seat->isStatus()){
+                $available++;
+            }
+        }
+
+        $travel_data =  [
+            'id' => $travel->getId(),
+            'start_city' => $travel->getStartCity(),
+            'end_city' => $travel->getEndCity(),
+            'user' => ['name' =>$driver[0]->getName(),'firstname' => $driver[0]->getFirstName()],
+            'startAt' => $travel->getStartTime(),
+            'endAt' => $travel->getEndTime(),
+            'travelTime' => '1h30',
+            'seat'=> [
+                'available'=>$available,
+                'max'=>count($seats),
+            ],
+            'car'=> [
+                'model'=>$car[0]->getModel(),
+                'color'=>$car[0]->getColor(),
+                'numberplate'=>$car[0]->getNumberplate(),
+            ]
+        ];
+
+        return $this->json($travel_data);
+    }
     /**
      * @Route("/new", name="new")
      */
