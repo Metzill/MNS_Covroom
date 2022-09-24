@@ -79,6 +79,51 @@ class BookingController extends AbstractController
     }
 
     /**
+     * @Route("/retrieve/user/{id_user}", name="retrieveByUser")
+     */
+    public function retrieveByUser(ManagerRegistry $doctrine, Request $request, $id_user): Response
+    {
+        $bookings = $doctrine
+            ->getRepository(Booking::class)
+            ->findBy(['IdUser'=>$id_user]);
+
+        $travel_array = [];
+
+        foreach ($bookings as $booking) {
+            $seats = $doctrine->getRepository(Seat::class)->findBy(['IdBooking'=>$booking->getId()]);
+            $travel = $doctrine->getRepository(Travel::class)->findBy(['id'=>$seats[0]->getIdTravel()->getId()]);
+            array_push($travel_array, $travel[0]->getId());
+        }
+
+        $dataToReturn = [];
+
+        foreach ($travel_array as $travelId) {
+            $travel = $doctrine->getRepository(Travel::class)->findBy(['id'=>$travelId]);
+            $travel = $travel[0];
+            $driver = $doctrine->getRepository(User::class)->findBy(['id'=>$travel->getIdUser()->getId()]);
+            $car = $doctrine->getRepository(Car::class)->findBy(['id'=>$travel->getIdCar()->getId()]);
+
+            $booking_data =  [
+                'id' => $travel->getId(),
+                'start_city' => $travel->getStartCity(),
+                'end_city' => $travel->getEndCity(),
+                'user' => ['name' =>$driver[0]->getName(),'firstname' => $driver[0]->getFirstName()],
+                'startAt' => $travel->getStartTime(),
+                'endAt' => $travel->getEndTime(),
+                'travelTime' => '1h30',
+                'seat'=> count($seats),
+                'car'=> [
+                    'model'=>$car[0]->getModel(),
+                    'color'=>$car[0]->getColor(),
+                    'numberplate'=>$car[0]->getNumberplate(),
+                ]
+            ];
+            array_push($dataToReturn, $booking_data);
+        }
+        return $this->json($dataToReturn);
+    }
+
+    /**
      * @Route("/retrieve/{id}", name="retrieve")
      */
     public function retrieve(ManagerRegistry $doctrine, Request $request, $id): Response
