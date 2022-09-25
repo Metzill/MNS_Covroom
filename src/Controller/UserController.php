@@ -80,7 +80,8 @@ class UserController extends AbstractController
         $user->setEmail($newPostJson['email']);
         $user->setName($newPostJson['name']);
         $user->setFirstname($newPostJson['firstName']);
-        $user->setPassword($newPostJson['password']);
+//        $user->setPassword($newPostJson['password']);
+        $user->setPassword(password_hash($newPostJson['password'], PASSWORD_DEFAULT));
         $user->setGender($newPostJson['gender']);
 //        $user->setAge($newPostJson['age']);
         $user->setAge(0);
@@ -139,5 +140,45 @@ class UserController extends AbstractController
         ];
 
         return $this->json($user_data);
+    }
+
+
+    /**
+     * @Route("/login", name="login")
+     */
+    public function login(ManagerRegistry $doctrine, Request $request): Response
+    {
+        $entityManager = $doctrine->getManager();
+
+        $newPostJson = json_decode($request->getContent(), true);
+
+        $today = new DateTime();
+        $today->setTimezone(new DateTimeZone("UTC"));
+
+        $user = $entityManager
+            ->getRepository(User::class)
+            ->findBy(['email'=>$newPostJson['email']]);
+        $user = $user[0];
+
+        if (!password_verify($newPostJson['password'],$user->getPassword())){
+            return $this->json([
+                'code' => '0',
+                'path' => 'Password not match',
+            ]);
+        }
+
+        $dataToReturn = [
+            'id' => $user->getId(),
+            'email' => $user->getEmail(),
+            'phoneNumber' => $user->getPhoneNumber(),
+            'profilPicture' => $user->getProfilePicture(),
+            'description' => $user->getDescription(),
+            'mailConfirm' => $user->isMailConfirmation(),
+            'role' => $user->getRole(),
+            'created_at' => $user->getCreatedAt(),
+            'updated_at' => $user->getUpdatedAt()
+        ];
+
+        return $this->json($dataToReturn);
     }
 }
