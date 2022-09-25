@@ -68,7 +68,7 @@ class CarController extends AbstractController
 
 
         $car->setColor($newPostJson['color']);
-        $car->setModel($newPostJson['model']);
+        $car->setModel($newPostJson['brand'] . ' - ' . $newPostJson['model']);
         $car->setYear(intval($newPostJson['year']));
         $car->setSeat($newPostJson['seat']);
         $car->setIdUser($user);
@@ -80,11 +80,11 @@ class CarController extends AbstractController
         $entityManager->persist(($car));
 
         $entityManager->flush();
-        return new Response('Saved new ar with id '. $car->getId());
+        return new Response('Saved new car with id '. $car->getId());
     }
 
     /**
-     * @Route("/delete/{car_id}", name="new")
+     * @Route("/delete/{car_id}", name="delete")
      */
     public function delete(ManagerRegistry $doctrine, Request $request, $car_id):Response
     {
@@ -108,24 +108,5 @@ class CarController extends AbstractController
                 'error' => 'Car already link to a travel.',
             ]);
         }
-    }
-
-    /**
-     * @Route("/delete/{car_id}", name="new")
-     */
-    public function update(ManagerRegistry $doctrine, Request $request, $car_id):Response
-    {
-            $entityManager = $doctrine->getManager();
-            $car = $doctrine
-                ->getRepository(Car::class)
-                ->find($car_id);
-
-            $entityManager->remove($car);
-
-            $entityManager->flush();
-            return $this->json([
-                'code' => '1',
-                'path' => 'Car delete',
-            ]);
     }
 }
