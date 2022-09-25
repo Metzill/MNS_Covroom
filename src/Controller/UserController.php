@@ -61,8 +61,8 @@ class UserController extends AbstractController
                 'deleted_at' => gmdate("Y-m-d H:i:s e", strtotime($deleted_at_dt)),
             ];
          }
-  
-         return $this->json($user_data); 
+
+         return $this->json($user_data);
     }
 
     /**
@@ -82,8 +82,10 @@ class UserController extends AbstractController
         $user->setFirstname($newPostJson['firstName']);
         $user->setPassword($newPostJson['password']);
         $user->setGender($newPostJson['gender']);
-        $user->setAge($newPostJson['age']);
-        $user->setProfilePicture($newPostJson['profilePicture']);
+//        $user->setAge($newPostJson['age']);
+        $user->setAge(0);
+//        $user->setProfilePicture($newPostJson['profilePicture']);
+        $user->setProfilePicture('null');
         $user->setPhoneNumber($newPostJson['phoneNumber']);
         $user->setRole($newPostJson['role']);
         $user->setMailConfirmation(0);
@@ -92,7 +94,7 @@ class UserController extends AbstractController
         $entityManager->persist(($user));
 
         $entityManager->flush();
-        
+
         return new Response('Saved new user with id '.$user->getId());
     }
 
@@ -113,7 +115,7 @@ class UserController extends AbstractController
         ->find($id);
 
         if(array_key_exists('email',$PutJson)) $user->setEmail($PutJson['email']);
-        if(array_key_exists('password',$PutJson)) $user->setPassword($PutJson['password']); 
+        if(array_key_exists('password',$PutJson)) $user->setPassword($PutJson['password']);
         if(array_key_exists('profilePicture',$PutJson)) $user->setProfilePicture($PutJson['profilePicture']);
         if(array_key_exists('phoneNumber',$PutJson)) $user->setPhoneNumber($PutJson['phoneNumber']);
         if(array_key_exists('role',$PutJson)) $user->setRole($PutJson['role']);
@@ -135,7 +137,7 @@ class UserController extends AbstractController
             'created_at' => $user->getCreatedAt(),
             'updated_at' => $user->getUpdatedAt()
         ];
-        
+
         return $this->json($user_data);
     }
 }
