@@ -119,8 +119,16 @@ class TravelController extends AbstractController
         $travel->setStartCity($newPostJson['startCity']);
         $travel->setEndCity($newPostJson['endCity']);
 //        temporaire
-        $travel->setStartTime($today);
-        $travel->setEndTime($today);
+        $start_at = new DateTime();
+        $start_at->setTimezone(new DateTimeZone("UTC"));
+        $dateHours = explode('T',$newPostJson['startDay']);
+        $date = explode('-',$dateHours[0]);
+        $hours = explode(':',$dateHours[1]);
+
+        date_date_set($start_at,$date[0],$date[1],$date[2]);
+        date_time_set($start_at,$hours[0],$hours[1]);
+        $travel->setStartTime($start_at);
+        $travel->setEndTime($start_at);
 
         $travel->setCreatedAt($today);
         $travel->setUpdatedAt($today);
