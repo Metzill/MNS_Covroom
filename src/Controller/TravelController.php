@@ -6,6 +6,7 @@ use App\Entity\Car;
 use App\Entity\Seat;
 use App\Entity\Travel;
 use App\Entity\User;
+use DateInterval;
 use DateTime;
 use DateTimeZone;
 use Doctrine\Persistence\ManagerRegistry;
@@ -91,8 +92,10 @@ class TravelController extends AbstractController
 
         return $this->json($travel_data);
     }
+
     /**
      * @Route("/new", name="new")
+     * @throws \Exception
      */
     public function new(ManagerRegistry $doctrine, Request $request): Response
     {
@@ -128,7 +131,22 @@ class TravelController extends AbstractController
         date_date_set($start_at,$date[0],$date[1],$date[2]);
         date_time_set($start_at,$hours[0],$hours[1]);
         $travel->setStartTime($start_at);
-        $travel->setEndTime($start_at);
+
+        $travelTime = explode('h',$newPostJson['travelTime']);
+        $string = 'PT' . $travelTime[0] . 'H' . $travelTime[1] . 'M';
+
+        $test = new DateTime();
+        $test->setTimezone(new DateTimeZone("UTC"));
+        $dateHours = explode('T',$newPostJson['startDay']);
+        $date = explode('-',$dateHours[0]);
+        $hours = explode(':',$dateHours[1]);
+
+        date_date_set($test,$date[0],$date[1],$date[2]);
+        date_time_set($test,$hours[0],$hours[1]);
+
+        $end_at = date_add($test, new DateInterval($string));
+
+        $travel->setEndTime($end_at);
 
         $travel->setCreatedAt($today);
         $travel->setUpdatedAt($today);
