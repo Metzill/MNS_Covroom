@@ -111,7 +111,6 @@ class TravelController extends AbstractController
         $car = $doctrine->getRepository(Car::class)->find($newPostJson['idCar']);
         $user = $doctrine->getRepository(User::class)->find($newPostJson['idUser']);
 
-
         $travel->setIdCar($car);
         $travel->setIdUser($user);
         $travel->setSeatAtTheBegining($newPostJson['seatAtTheBegining']);
@@ -194,6 +193,59 @@ class TravelController extends AbstractController
         $travels = $tmp;
 
         $travel_data = [];
+
+        foreach ($travels as $travel) {
+            $driver = $doctrine->getRepository(User::class)->findBy(['id'=>$travel->getIdUser()->getId()]);
+            $travel_data[] = [
+                'id' => $travel->getId(),
+                'start_city' => $travel->getStartCity(),
+                'end_city' => $travel->getEndCity(),
+                'user' => ['name' =>$driver[0]->getName(),'firstname' => $driver[0]->getFirstName()],
+                'startAt' => $travel->getStartTime(),
+                'endAt' => $travel->getEndTime(),
+                'travelTime' => '1h30',
+            ];
+        }
+
+        return $this->json($travel_data);
+    }
+
+    /**
+     * @Route("/search", name="search")
+     */
+    public function search(ManagerRegistry $doctrine): Response
+    {
+        $today = new DateTime();
+        $today->setTimezone(new DateTimeZone("UTC"));
+
+        $travels = $doctrine
+            ->getRepository(Travel::class)
+            ->findAll();
+
+        $tmp = [];
+
+        foreach ($travels as $travel) {
+            $isFuture = false;
+            $seatFree = false;
+            $seats = $doctrine->getRepository(Seat::class)->findBy(['IdTravel'=>$travel->getId()]);
+
+            if ($today < $travel->getStartTime()) {
+                $isFuture = true;
+            }
+            foreach($seats as $seat) {
+                if ($seat->isStatus() === false){
+                    $seatFree = true;
+                }
+            }
+            if ($isFuture && $seatFree) {
+                array_push($tmp,$travel);
+            }
+        }
+
+        $travels = $tmp;
+
+        $travel_data = [];
+
 
         foreach ($travels as $travel) {
             $driver = $doctrine->getRepository(User::class)->findBy(['id'=>$travel->getIdUser()->getId()]);
