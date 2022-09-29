@@ -183,4 +183,31 @@ class UserController extends AbstractController
 
         return $this->json($dataToReturn);
     }
+
+
+    /**
+     * @Route("/retrieve/{user_id}", name="retrieve")
+     */
+    public function retrieve(ManagerRegistry $doctrine, $user_id): Response
+    {
+        $user = $doctrine
+            ->getRepository(User::class)
+            ->find($user_id);
+
+        $dataToReturn = [
+            'id' => $user->getId(),
+            'email' => $user->getEmail(),
+            'phoneNumber' => $user->getPhoneNumber(),
+            'profilPicture' => $user->getProfilePicture(),
+            'description' => $user->getDescription(),
+            'mailConfirm' => $user->isMailConfirmation(),
+            'name' => $user->getName(),
+            'firstName' => $user->getFirstname(),
+            'role' => $user->getRole(),
+            'created_at' => $user->getCreatedAt(),
+            'updated_at' => $user->getUpdatedAt()
+        ];
+
+        return $this->json($dataToReturn);
+    }
 }
