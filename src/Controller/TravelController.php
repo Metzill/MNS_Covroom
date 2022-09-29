@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\Booking;
 use App\Entity\Car;
 use App\Entity\Seat;
 use App\Entity\Travel;
@@ -261,5 +262,70 @@ class TravelController extends AbstractController
         }
 
         return $this->json($travel_data);
+    }
+
+    /**
+     * @Route("/retrieve/user/{id_user}", name="retrieveByUser")
+     */
+    public function retrieveByUser(ManagerRegistry $doctrine, Request $request, $id_user): Response
+    {
+        $travels = $doctrine
+            ->getRepository(Travel::class)
+            ->findBy(['IdUser'=>$id_user]);
+
+        $travel_array = [];
+
+        foreach ($travels as $travel) {
+            $seats = $doctrine->getRepository(Seat::class)->findBy(['IdTravel'=>$travel->getId()]);
+            $seatsData = [];
+            $bookedSeats = 0;
+            foreach ($seats as $seat) {
+                if ($seat->getIdBooking()) {
+                    $booking = $doctrine->getRepository(Booking::class)->find($seat->getIdBooking()->getId());
+                    $user = $doctrine->getRepository(User::class)->findBy(['id'=>$booking->getIdUser()->getId()]);
+                    $user = $user[0];
+                    $seatData = [
+                        'id'=>$seat->getId(),
+                        'status'=>$seat->isStatus(),
+                        'bookingId'=>$seat->getIdBooking()->getId(),
+                        'name'=>$user->getName(),
+                        'firstname'=>$user->getFirstname(),
+                        'idUser'=>$user->getId(),
+                    ];
+                    $bookedSeats++;
+                } else {
+                    $seatData = [
+                        'id'=>$seat->getId(),
+                        'status'=>$seat->isStatus(),
+                    ];
+                }
+                array_push($seatsData, $seatData);
+            }
+            $car = $doctrine->getRepository(Car::class)->findBy(['id'=>$travel->getIdCar()->getId()]);
+            $car = $car[0];
+
+            $carData=[
+                'id'=>$car->getId(),
+                'color'=>$car->getColor(),
+                'model'=>$car->getModel(),
+            ];
+
+            $travelData = [
+                'id'=>$travel->getId(),
+                'seats'=> [
+                    'max'=>$travel->getSeatAtTheBegining(),
+                    'available'=>$bookedSeats,
+                ],
+                'seat'=>$seatsData,
+                'car'=>$carData,
+                'startCity'=>$travel->getstartCity(),
+                'endCity'=>$travel->getEndCity(),
+                'startAt'=>$travel->getStartTime(),
+                'endAt'=>$travel->getEndTime(),
+                ];
+            array_push($travel_array, $travelData);
+        }
+
+        return $this->json($travel_array);
     }
 }
