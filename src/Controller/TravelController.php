@@ -7,6 +7,7 @@ use App\Entity\Car;
 use App\Entity\Seat;
 use App\Entity\Travel;
 use App\Entity\User;
+use Carbon\Carbon;
 use DateInterval;
 use DateTime;
 use DateTimeZone;
@@ -222,8 +223,16 @@ class TravelController extends AbstractController
     /**
      * @Route("/search", name="search")
      */
-    public function search(ManagerRegistry $doctrine): Response
+    public function search(ManagerRegistry $doctrine, Request $request): Response
     {
+        $newPostJson = json_decode($request->getContent(), true);
+
+        $filter_people = $newPostJson['people'] === 0; //par defaut a false il faut les passer a true pour passer le filtre
+        $filter_date = $newPostJson['date'] === 0;
+
+        $filter_start = $newPostJson['startLong'] === 'null';
+        $filter_end = $newPostJson['endLong'] === 'null';
+
         $today = new DateTime();
         $today->setTimezone(new DateTimeZone("UTC"));
 
@@ -236,17 +245,35 @@ class TravelController extends AbstractController
         foreach ($travels as $travel) {
             $isFuture = false;
             $seatFree = false;
+            $current_filter_people = $filter_people;
+            $current_filter_date = $filter_date;
+            $current_filter_start = $filter_start;
+            $current_filter_end = $filter_end;
             $seats = $doctrine->getRepository(Seat::class)->findBy(['IdTravel'=>$travel->getId()]);
 
             if ($today < $travel->getStartTime()) {
                 $isFuture = true;
             }
+            $availableSeat = 0;
             foreach($seats as $seat) {
                 if ($seat->isStatus() === false){
+                    $availableSeat++;
                     $seatFree = true;
                 }
             }
-            if ($isFuture && $seatFree) {
+            if($availableSeat >= $newPostJson['people']) {
+                $current_filter_people = true;
+            }
+            if($travel->getStartTime()->format('Y-m-d') === $newPostJson['date']) {
+                $current_filter_date = true;
+            }
+            if($travel->getStartLatitude() === floatval($newPostJson['startLat']) && $travel->getStartLongitude() === floatval($newPostJson['startLong'])) {
+                $current_filter_start = true;
+            }
+            if($travel->getEndLatitude() === floatval($newPostJson['endLat']) && $travel->getEndLongitude() === floatval($newPostJson['endLong'])) {
+                $current_filter_end = true;
+            }
+            if ($isFuture && $seatFree && $current_filter_people && $current_filter_date && $current_filter_start && $current_filter_end) {
                 array_push($tmp,$travel);
             }
         }
@@ -254,7 +281,6 @@ class TravelController extends AbstractController
         $travels = $tmp;
 
         $travel_data = [];
-
 
         foreach ($travels as $travel) {
             $driver = $doctrine->getRepository(User::class)->findBy(['id'=>$travel->getIdUser()->getId()]);
@@ -282,6 +308,8 @@ class TravelController extends AbstractController
             ->findBy(['IdUser'=>$id_user]);
 
         $travel_array = [];
+
+        $today = new DateTime();
 
         foreach ($travels as $travel) {
             $seats = $doctrine->getRepository(Seat::class)->findBy(['IdTravel'=>$travel->getId()]);
@@ -330,6 +358,7 @@ class TravelController extends AbstractController
                 'endCity'=>$travel->getEndCity(),
                 'startAt'=>$travel->getStartTime(),
                 'endAt'=>$travel->getEndTime(),
+                'isFuture'=> $travel->getStartTime() > $today,
                 ];
             array_push($travel_array, $travelData);
         }
