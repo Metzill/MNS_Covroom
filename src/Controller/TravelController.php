@@ -80,6 +80,14 @@ class TravelController extends AbstractController
             'startAt' => $travel->getStartTime(),
             'endAt' => $travel->getEndTime(),
             'travelTime' => '1h30',
+            'start'=> [
+                'lng'=>$travel->getStartLatitude(),
+                'lat'=>$travel->getStartLongitude(),
+            ],
+            'end'=> [
+                'lng'=>$travel->getEndLatitude(),
+                'lat'=>$travel->getEndLongitude(),
+            ],
             'seat'=> [
                 'available'=>$available,
                 'max'=>count($seats),
