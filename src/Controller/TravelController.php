@@ -77,7 +77,7 @@ class TravelController extends AbstractController
             'id' => $travel->getId(),
             'start_city' => $travel->getStartCity(),
             'end_city' => $travel->getEndCity(),
-            'user' => ['name' =>$driver[0]->getName(),'firstname' => $driver[0]->getFirstName()],
+            'user' => ['name' =>$driver[0]->getName(),'firstname' => $driver[0]->getFirstName(),'id' => $driver[0]->getId()],
             'startAt' => $travel->getStartTime(),
             'endAt' => $travel->getEndTime(),
             'travelTime' => '1h30',

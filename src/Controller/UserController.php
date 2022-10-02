@@ -168,6 +168,7 @@ class UserController extends AbstractController
         }
 
         $dataToReturn = [
+            'code' => '1',
             'id' => $user->getId(),
             'email' => $user->getEmail(),
             'phoneNumber' => $user->getPhoneNumber(),
