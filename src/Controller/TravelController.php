@@ -327,6 +327,7 @@ class TravelController extends AbstractController
                         'name'=>$user->getName(),
                         'firstname'=>$user->getFirstname(),
                         'idUser'=>$user->getId(),
+                        'phoneNumber'=>$user->getPhoneNumber(),
                     ];
                     $bookedSeats++;
                 } else {
