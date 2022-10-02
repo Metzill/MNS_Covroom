@@ -116,12 +116,12 @@ class UserController extends AbstractController
         ->find($id);
 
         if(array_key_exists('email',$PutJson)) $user->setEmail($PutJson['email']);
-        if(array_key_exists('password',$PutJson)) $user->setPassword($PutJson['password']);
-        if(array_key_exists('profilePicture',$PutJson)) $user->setProfilePicture($PutJson['profilePicture']);
+//        if(array_key_exists('password',$PutJson)) $user->setPassword($PutJson['password']);
+//        if(array_key_exists('profilePicture',$PutJson)) $user->setProfilePicture($PutJson['profilePicture']);
         if(array_key_exists('phoneNumber',$PutJson)) $user->setPhoneNumber($PutJson['phoneNumber']);
         if(array_key_exists('role',$PutJson)) $user->setRole($PutJson['role']);
         if(array_key_exists('description',$PutJson)) $user->setDescription($PutJson['description']);
-        if(array_key_exists('mailConfirm',$PutJson)) $user->setMailConfirmation($PutJson['mailConfirm']);
+        if(array_key_exists('mailConfirm',$PutJson)) $user->setMailConfirmation(false);
         $user->setUpdatedAt($today);
 
         $entityManager->persist(($user));

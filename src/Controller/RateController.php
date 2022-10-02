@@ -57,4 +57,63 @@ class RateController extends AbstractController
             'path' => 'src/Controller/RateController.php',
         ]);
     }
+
+    /**
+     * @Route("/user/{user_id}", name="retrieveUser")
+     */
+    public function retrieveByUser(ManagerRegistry $doctrine, Request $request, int $user_id): Response
+    {
+
+        $from = $doctrine->getRepository(Rate::class)->findBy(['IdUserRating'=>$user_id]);
+        $to = $doctrine->getRepository(Rate::class)->findBy(['IdUserRated'=>$user_id]);
+
+        $dataToReturn = [
+            'from' => [],
+            'to' => [],
+        ];
+
+        $total = 0;
+        foreach ($to as $rate) {
+            $total += $rate->getRate();
+
+            $user = $doctrine->getRepository(User::class)->findBy(['id'=>$rate->getIdUserRated()]);
+            $user = $user[0];
+            $dataRate = [
+                'id'=>$rate->getId(),
+                'rate'=>$rate->getRate(),
+                'comment'=>$rate->getComment(),
+                'ratedUser'=>[
+                    'id'=>$user->getId(),
+                    'name'=>$user->getName(),
+                    'firstName'=>$user->getFirstName(),
+                ]
+            ];
+            array_push($dataToReturn['to'], $dataRate);
+        }
+
+        foreach ($from as $rate){
+            $user = $doctrine->getRepository(User::class)->findBy(['id'=>$rate->getIdUserRated()]);
+            $user = $user[0];
+            $dataRate = [
+                'id'=>$rate->getId(),
+                'rate'=>$rate->getRate(),
+                'comment'=>$rate->getComment(),
+                'ratedUser'=>[
+                    'id'=>$user->getId(),
+                    'name'=>$user->getName(),
+                    'firstName'=>$user->getFirstName(),
+                ]
+            ];
+            array_push($dataToReturn['from'], $dataRate);
+        }
+
+        if (count($to)){
+            $dataToReturn['average'] =  $total / count($to);
+            $dataToReturn['quantity'] =  count($to);
+        } else {
+            $dataToReturn['average'] = 0;
+            $dataToReturn['quantity'] = 0;
+        }
+        return $this->json($dataToReturn);
+    }
 }
