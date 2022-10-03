@@ -33,7 +33,10 @@ class RateController extends AbstractController
      */
     public function new(ManagerRegistry $doctrine, Request $request): Response
     {
+        $entityManager = $doctrine->getManager();
         $newPostJson = json_decode($request->getContent(), true);
+
+        // check if rate already exists
 
         $today = new DateTime();
         $today->setTimezone(new DateTimeZone("UTC"));
@@ -45,6 +48,7 @@ class RateController extends AbstractController
 
         $rate->setComment($newPostJson['comment']);
         $rate->setRate($newPostJson['rate']);
+        $rate->setTravelId($newPostJson['travelId']);
 
         $rate->setIdUserRating($userFrom);
         $rate->setIdUserRated($userTo);
@@ -52,10 +56,16 @@ class RateController extends AbstractController
         $rate->setCreatedAt($today);
         $rate->setUpdatedAt($today);
 
+        $entityManager->persist(($rate));
+
+        $entityManager->flush();
+
         return $this->json([
-            'message' => 'Welcome to your new controller!',
-            'path' => 'src/Controller/RateController.php',
+            'code' => '1',
+            'message' => 'Saved new notation with id '. $rate->getId(),
         ]);
+
+
     }
 
     /**

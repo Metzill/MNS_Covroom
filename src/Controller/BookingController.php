@@ -89,6 +89,8 @@ class BookingController extends AbstractController
 
         $travel_array = [];
 
+        $today = new DateTime();
+
         foreach ($bookings as $booking) {
             $seats = $doctrine->getRepository(Seat::class)->findBy(['IdBooking'=>$booking->getId()]);
             $travel = $doctrine->getRepository(Travel::class)->findBy(['id'=>$seats[0]->getIdTravel()->getId()]);
@@ -112,6 +114,7 @@ class BookingController extends AbstractController
                 'endAt' => $travel->getEndTime(),
                 'travelTime' => '1h30',
                 'seat'=> count($seats),
+                'isFuture'=> $travel->getStartTime() > $today,
                 'car'=> [
                     'model'=>$car[0]->getModel(),
                     'color'=>$car[0]->getColor(),

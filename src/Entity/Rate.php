@@ -54,6 +54,11 @@ class Rate
      */
     private $deleted_at;
 
+    /**
+     * @ORM\Column(type="integer")
+     */
+    private $travel_id;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -139,6 +144,18 @@ class Rate
     public function setDeletedAt(\DateTimeInterface $deleted_at): self
     {
         $this->deleted_at = $deleted_at;
+
+        return $this;
+    }
+
+    public function getTravelId(): ?int
+    {
+        return $this->travel_id;
+    }
+
+    public function setTravelId(int $travel_id): self
+    {
+        $this->travel_id = $travel_id;
 
         return $this;
     }
