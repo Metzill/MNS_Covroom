@@ -36,15 +36,26 @@ class RateController extends AbstractController
         $entityManager = $doctrine->getManager();
         $newPostJson = json_decode($request->getContent(), true);
 
+        $userFrom = $doctrine->getRepository(User::class)->find($newPostJson['idFrom']);
+        $userTo = $doctrine->getRepository(User::class)->find($newPostJson['idTo']);
+
         // check if rate already exists
+        $checkIfExists = $doctrine->getRepository(Rate::class)->findBy(
+            ['IdUserRating'=>$userFrom, 'IdUserRated'=>$userTo,'travel_id'=>$newPostJson['travelId']]
+        );
+
+        if (count($checkIfExists)>0) {
+            return $this->json([
+                'code' => '0',
+                'message' => 'Notation already exists for this users and this travel.',
+            ]);
+        }
+
 
         $today = new DateTime();
         $today->setTimezone(new DateTimeZone("UTC"));
 
         $rate = new Rate();
-
-        $userFrom = $doctrine->getRepository(User::class)->find($newPostJson['idFrom']);
-        $userTo = $doctrine->getRepository(User::class)->find($newPostJson['idTo']);
 
         $rate->setComment($newPostJson['comment']);
         $rate->setRate($newPostJson['rate']);
@@ -64,8 +75,6 @@ class RateController extends AbstractController
             'code' => '1',
             'message' => 'Saved new notation with id '. $rate->getId(),
         ]);
-
-
     }
 
     /**
